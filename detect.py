@@ -267,13 +267,13 @@ def run(
                     crop_path = crop_dir / f"{p.stem}_{label}_{x1}_{y1}.jpg"
                     cv2.imwrite(str(crop_path), cropped_img)
 
-                    # แสดงภาพที่ตัดในหน้าต่างใหม่ (หากต้องการดู)
-                    window_name = f"Crop: {label}"
-                    cv2.imshow(window_name, cropped_img)
+                    # # แสดงภาพที่ตัดในหน้าต่างใหม่ (หากต้องการดู)
+                    # window_name = f"Crop: {label}"
+                    # cv2.imshow(window_name, cropped_img)
 
-                    # รอการกดปุ่มเพื่อปิดหน้าต่าง
-                    cv2.waitKey(0)
-                    cv2.destroyWindow(window_name)
+                    # # รอการกดปุ่มเพื่อปิดหน้าต่าง
+                    # cv2.waitKey(0)
+                    # cv2.destroyWindow(window_name)
 
             # Stream results
             im0 = annotator.result()
