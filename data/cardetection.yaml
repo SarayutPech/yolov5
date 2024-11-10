@@ -1,0 +1,8 @@
+train:  F:\workstation\python\CarDetection\asset\lib\train_data\images\train
+val:    F:\workstation\python\CarDetection\asset\lib\train_data\images\val
+
+# Classes
+nc: 2
+names:
+  0: Fullcar
+  1: TruckPlate

@@ -253,27 +253,30 @@ def run(
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
                     c = int(cls)  # integer class
-                    label = names[c]  # ชื่อคลาส
-                    x1, y1, x2, y2 = map(int, xyxy)  # แปลงค่าตำแหน่งกรอบเป็น integer
+                    label = names[c] if hide_conf else f"{names[c]}"
+                    confidence = float(conf)
+                    confidence_str = f"{confidence:.2f}"
 
-                    # ตัดภาพเฉพาะในกรอบ
-                    cropped_img = im0[y1:y2, x1:x2]
+                    if save_csv:
+                        write_to_csv(p.name, label, confidence_str)
 
-                    # สร้างโฟลเดอร์สำหรับแต่ละ Label
-                    crop_dir = save_dir / "crops" / label
-                    crop_dir.mkdir(parents=True, exist_ok=True)
+                    if save_txt:  # Write to file
+                        if save_format == 0:
+                            coords = (
+                                (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()
+                            )  # normalized xywh
+                        else:
+                            coords = (torch.tensor(xyxy).view(1, 4) / gn).view(-1).tolist()  # xyxy
+                        line = (cls, *coords, conf) if save_conf else (cls, *coords)  # label format
+                        with open(f"{txt_path}.txt", "a") as f:
+                            f.write(("%g " * len(line)).rstrip() % line + "\n")
 
-                    # บันทึกภาพที่ตัดในโฟลเดอร์
-                    crop_path = crop_dir / f"{p.stem}_{label}_{x1}_{y1}.jpg"
-                    cv2.imwrite(str(crop_path), cropped_img)
-
-                    # แสดงภาพที่ตัดในหน้าต่างใหม่ (หากต้องการดู)
-                    window_name = f"Crop: {label}"
-                    cv2.imshow(window_name, cropped_img)
-
-                    # รอการกดปุ่มเพื่อปิดหน้าต่าง
-                    cv2.waitKey(0)
-                    cv2.destroyWindow(window_name)
+                    if save_img or save_crop or view_img:  # Add bbox to image
+                        c = int(cls)  # integer class
+                        label = None if hide_labels else (names[c] if hide_conf else f"{names[c]} {conf:.2f}")
+                        annotator.box_label(xyxy, label, color=colors(c, True))
+                    if save_crop:
+                        save_one_box(xyxy, imc, file=save_dir / "crops" / names[c] / f"{p.stem}.jpg", BGR=True)
 
             # Stream results
             im0 = annotator.result()
